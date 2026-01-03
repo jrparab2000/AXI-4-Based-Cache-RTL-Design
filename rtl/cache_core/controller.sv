@@ -5,29 +5,29 @@ module controller (
     //cpu control interface
     input rw,
     input valid_in_c,
-    output hit_miss,
-    output out_valid,
+    output reg hit_miss,
+    output reg out_valid,
 
     //internal control signals 
     input dirty,
     input match,
     input valid_tag,
-    output [2:0] tag_replace,
-    output [2:0] dirty_replace,
-    output [2:0] data_replace,
-    output [1:0] lru_replace,
+    output reg [2:0] tag_replace,
+    output reg [2:0] dirty_replace,
+    output reg [2:0] data_replace,
+    output reg [1:0] lru_replace,
 
     //write back control signals
     input ready_wb,
-    output valid_wb,
+    output reg valid_wb,
 
     //load control signals
     input valid_ld,
-    output ready_ld,
+    output reg ready_ld,
 
     //mem control signals 
-    output out_rw,
-    output addr_valid_out
+    output reg out_rw,
+    output reg addr_valid_out
 );
     
     typedef enum [1:0] { IDLE, HIT, WB, LD} states;
@@ -36,7 +36,7 @@ module controller (
     always_ff @(posedge clk) begin
         if(!rst_n) begin
             cs <= IDLE;
-            ns <= IDLE;
+            // ns <= IDLE;
         end
         else begin
             cs <= ns;
@@ -44,6 +44,7 @@ module controller (
     end
 
     always_comb begin
+        ns = IDLE;
         case (cs)
             IDLE    :   begin
                 tag_replace = 3'b000;

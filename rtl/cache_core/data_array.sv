@@ -14,22 +14,34 @@ module data_array #(
     input [DATA_SIZE-1:0] data_in_c, //from processor
     input [BLOCKS-1:0][DATA_SIZE-1:0] data_in_m, //from memory
     output [DATA_SIZE-1:0] data_out, 
-    output [BLOCKS-1:0][DATA_SIZE-1:0] data_out_m, //to memory
+    output reg [BLOCKS-1:0][DATA_SIZE-1:0] data_out_m //to memory
 );
     localparam BLOCKS = 2**BLOCK_SIZE;
     localparam SETS = 2**INDEX_SIZE;
 
     reg [BLOCKS-1:0][DATA_SIZE-1:0] mem [SETS-1:0][ASSOC-1:0];
+    reg [BLOCKS-1:0][DATA_SIZE-1:0] mem_next [SETS-1:0][ASSOC-1:0];
+
+    always_comb begin
+        foreach(mem_next[i]) begin
+            foreach(mem_next[i][j]) begin
+                foreach(mem_next[i][j][k]) begin
+                    mem_next[i][j][k] = 0;
+                end
+            end
+        end
+    end
 
     always_ff @( posedge clk ) begin : load_store
         if(replace == 3'b000) begin
-            foreach(mem[i]) begin
-                foreach(mem[i][j]) begin
-                    foreach(mem[i][j][k]) begin
-                        mem[i][j][k] <= DATA_SIZE'b0;
-                    end
-                end
-            end
+            // foreach(mem[i]) begin
+            //     foreach(mem[i][j]) begin
+            //         foreach(mem[i][j][k]) begin
+            //             mem[i][j][k] <= 0;
+            //         end
+            //     end
+            // end
+            mem <= mem_next;
             // data_out <= 0;
             data_out_m <= 0;
         end

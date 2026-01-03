@@ -1,6 +1,5 @@
 module dirty_array #(
     parameter ASSOC = 8,
-    parameter BLOCK_SIZE = 6,
     parameter INDEX_SIZE = 7
 ) (
     input clk,
@@ -12,14 +11,21 @@ module dirty_array #(
 
     localparam SETS = 2**INDEX_SIZE;
     reg mem [SETS-1:0][ASSOC-1:0];
+    reg mem_next [SETS-1:0][ASSOC-1:0];
 
     assign dirty = mem[index][assoc];
 
+    always_comb begin
+        foreach(mem[i,j]) begin
+            mem_next[i][j] = 1'b0;
+        end
+    end
     always_ff @( posedge clk ) begin
         if(replace == 3'b000) begin
-            foreach(mem[i,j]) begin
-                mem[i][j] <= 1'b0;
-            end
+            // foreach(mem[i,j]) begin
+            //     mem[i][j] <= 1'b0;
+            // end
+            mem <= mem_next;
         end
         else if(replace == 3'b001) begin // hit and write
             mem[index][assoc] <= 1'b1;

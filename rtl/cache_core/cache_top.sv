@@ -1,3 +1,10 @@
+// `include "address_decode.sv"
+// `include "controller.sv"
+// `include "data_array.sv"
+// `include "dirty_array.sv"
+// `include "lru_array.sv"
+// `include "tag_array.sv"
+
 module cache_top #(
     parameter ASSOC = 8,
     parameter ADDR_SIZE = 32,
@@ -33,6 +40,8 @@ module cache_top #(
     input [BLOCKS-1:0][DATA_SIZE-1:0] data_in_m,
     output ready_ld
 );
+    localparam BLOCKS = 2**BLOCK_SIZE;
+
     wire dirty;
     wire match;
     wire valid_tag;
@@ -58,7 +67,7 @@ module cache_top #(
         .tag(tag),
         .index(index),
         .lru(lru),
-        .dirty(dirty),
+        // .dirty(dirty),
         .replace(tag_replace),
         .match(match),
         .valid(valid_tag),
@@ -76,7 +85,7 @@ module cache_top #(
         .data_out(data_out),
         .data_out_m(data_out_m)
     );
-    dirty_array  #(.ASSOC(ASSOC), .BLOCK_SIZE(BLOCK_SIZE), .INDEX_SIZE(INDEX_SIZE)) dirty_mem (
+    dirty_array  #(.ASSOC(ASSOC), .INDEX_SIZE(INDEX_SIZE)) dirty_mem (
         .clk(clk),
         .index(index),
         .assoc(assoc),
@@ -109,5 +118,5 @@ module cache_top #(
         .index(index),
         .tag(tag),
         .block(block)
-    )
+    );
 endmodule
