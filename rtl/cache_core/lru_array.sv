@@ -15,7 +15,7 @@ module lru_array #(
 
     always_comb begin
         lru = 0;
-        foreach(lrus[index][i]) begin
+        for(int i =0; i<ASSOC; i++) begin
             if(lrus[index][i] == ({SIZE{1'b1}})) begin
                 lru = lrus[index][i];
             end
@@ -25,14 +25,12 @@ module lru_array #(
     always_comb begin
         lrus_next = lrus;
         if(replace == 2'b00) begin
-            foreach(lrus_next[i]) begin
-                foreach(lrus_next[i][j]) begin
-                    lrus_next[i][j] = SIZE'(j);
-                end
+            foreach(lrus_next[i,j]) begin
+                lrus_next[i][j] = SIZE'(j);
             end
         end
         else if(replace == 2'b01) begin
-            foreach(lrus_next[index][i]) begin
+            for(int i =0; i<ASSOC; i++) begin
                 if(lrus_next[index][i] < lrus_next[index][assoc]) begin
                     lrus_next[index][i] = lrus_next[index][i] + 1;
                 end
@@ -40,7 +38,7 @@ module lru_array #(
             lrus_next[index][assoc] = 'b0;
         end
         else if(replace == 2'b10) begin
-            foreach(lrus_next[index][i]) begin
+            for(int i =0; i<ASSOC; i++) begin
                 if(lrus_next[index][i] != ({SIZE{1'b1}})) begin
                     lrus_next[index][i] = lrus_next[index][i] + 1;
                 end

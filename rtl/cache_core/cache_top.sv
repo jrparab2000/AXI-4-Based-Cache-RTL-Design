@@ -11,7 +11,8 @@ module cache_top #(
     parameter DATA_SIZE = 32,
     parameter BLOCK_SIZE = 6,
     parameter INDEX_SIZE = 7, 
-    parameter TAG_SIZE = ADDR_SIZE - BLOCK_SIZE - INDEX_SIZE
+    parameter TAG_SIZE = ADDR_SIZE - BLOCK_SIZE - INDEX_SIZE,
+    localparam BLOCKS = 1<<BLOCK_SIZE
 ) (
     input clk,
     input rst_n,
@@ -40,7 +41,7 @@ module cache_top #(
     input [BLOCKS-1:0][DATA_SIZE-1:0] data_in_m,
     output ready_ld
 );
-    localparam BLOCKS = 2**BLOCK_SIZE;
+    
 
     wire dirty;
     wire match;

@@ -1,0 +1,21 @@
+set IterationLimit 140000
+set NoQuitOnFinish 1
+add wave /testbench_cache_core/cache/clk
+add wave /testbench_cache_core/cache/rst_n
+add wave /testbench_cache_core/cache/valid_in_c
+add wave /testbench_cache_core/cache/rw
+add wave /testbench_cache_core/cache/addr
+add wave /testbench_cache_core/cache/data_in
+add wave /testbench_cache_core/cache/data_out
+add wave /testbench_cache_core/cache/valid_out_c
+add wave /testbench_cache_core/cache/hit_miss
+add wave /testbench_cache_core/cache/addr_valid_out
+add wave /testbench_cache_core/cache/addr_out_m
+add wave /testbench_cache_core/cache/rw_out
+add wave /testbench_cache_core/cache/ready_wb
+add wave /testbench_cache_core/cache/valid_wb
+add wave /testbench_cache_core/cache/data_out_m
+add wave /testbench_cache_core/cache/valid_ld
+add wave /testbench_cache_core/cache/data_in_m
+add wave /testbench_cache_core/cache/ready_ld
+run -all

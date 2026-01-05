@@ -1,4 +1,8 @@
-module controller (
+module controller #(
+    parameter BLOCK_SIZE = 6,
+    parameter WR_M_DATA_SIZE = 4
+    )
+    (
     input clk,
     input rst_n,
 
@@ -29,8 +33,9 @@ module controller (
     output reg out_rw,
     output reg addr_valid_out
 );
-    
-    typedef enum [1:0] { IDLE, HIT, WB, LD} states;
+    reg [BLOCK_SIZE-1:0]counter, counter_next;
+    reg [1:0] count_ctrl;
+    typedef enum logic [2:0] { IDLE, HIT, WB, LD, INCR} states;
     states cs, ns;
 
     always_ff @(posedge clk) begin
@@ -57,6 +62,7 @@ module controller (
                 out_valid = 1'b0;
                 hit_miss = 1'b0;
                 addr_valid_out = 1'b0;
+                count_ctrl = 2'b00;
                 ns = HIT;
             end 
 
@@ -71,6 +77,7 @@ module controller (
                 hit_miss = 1'b0;
                 lru_replace = 2'b11;
                 addr_valid_out = 1'b0;
+                count_ctrl = 2'b00;
 
                 if(valid_in_c) begin
                     if (match) begin
@@ -120,6 +127,7 @@ module controller (
                 hit_miss = 1'b0;
                 lru_replace = 2'b11;
                 addr_valid_out = 1'b1;
+                count_ctrl = 2'b00;
 
                 if (ready_wb) begin
                     dirty_replace = 3'b100;
@@ -141,6 +149,7 @@ module controller (
                 hit_miss = 1'b0;
                 lru_replace = 2'b11;
                 addr_valid_out = 1'b1;
+                count_ctrl = 2'b00;
                 
                 if(valid_ld) begin
                     tag_replace = 3'b001;
@@ -158,6 +167,19 @@ module controller (
                    ns = LD; 
                 end
             end
+            INCR    :   begin
+                
+            end
         endcase
+    end
+
+    always_comb begin
+        counter_next = counter;
+        if(count_ctrl == 2'b00) begin
+            counter_next = {BLOCK_SIZE{1'b0}};
+        end
+        else if (count_ctrl == 2'b01) begin
+            counter_next = counter + 1;
+        end
     end
 endmodule

@@ -28,7 +28,7 @@ module tag_array #(
     always_comb begin : match_logic
         match = 1'b0;
         temp_assoc = 'b0;
-        foreach(tags[index][i]) begin
+        for(int i =0; i<ASSOC; i++) begin
             if(tags[index][i] == tag && valids[index][i]) begin
                 match = 1'b1;
                 temp_assoc = SIZE'(i);
@@ -37,11 +37,9 @@ module tag_array #(
     end
 
     always_comb begin
-       foreach(tags_next[i]) begin
-            foreach(tags_next[i][j]) begin
-                tags_next[i][j] = 'b0;
-                valids_next[i][j] = 1'b0;
-            end
+       foreach(tags_next[i,j]) begin
+            tags_next[i][j] = 'b0;
+            valids_next[i][j] = 1'b0;
         end 
     end
     always_ff @(posedge clk) begin : replacing_logic

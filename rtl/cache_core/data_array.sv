@@ -2,7 +2,9 @@ module data_array #(
     parameter ASSOC = 8,
     parameter DATA_SIZE = 32,
     parameter BLOCK_SIZE = 6,
-    parameter INDEX_SIZE = 7
+    parameter INDEX_SIZE = 7,
+    parameter WR_M_DATA_SIZE = 4,
+    parameter BLOCKS = 1<<BLOCK_SIZE
 ) (
     input clk,
     input [INDEX_SIZE-1:0] index,
@@ -16,19 +18,15 @@ module data_array #(
     output [DATA_SIZE-1:0] data_out, 
     output reg [BLOCKS-1:0][DATA_SIZE-1:0] data_out_m //to memory
 );
-    localparam BLOCKS = 2**BLOCK_SIZE;
+    
     localparam SETS = 2**INDEX_SIZE;
 
     reg [BLOCKS-1:0][DATA_SIZE-1:0] mem [SETS-1:0][ASSOC-1:0];
     reg [BLOCKS-1:0][DATA_SIZE-1:0] mem_next [SETS-1:0][ASSOC-1:0];
 
     always_comb begin
-        foreach(mem_next[i]) begin
-            foreach(mem_next[i][j]) begin
-                foreach(mem_next[i][j][k]) begin
-                    mem_next[i][j][k] = 0;
-                end
-            end
+        foreach(mem_next[i,j,k]) begin
+            mem_next[i][j][k] = 0;
         end
     end
 
