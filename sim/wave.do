@@ -3,7 +3,9 @@ set NoQuitOnFinish 1
 add wave /testbench_cache_core/cache/clk
 add wave /testbench_cache_core/cache/rst_n
 add wave /testbench_cache_core/cache/valid_in_c
+add wave /testbench_cache_core/cache/cache_ready
 add wave /testbench_cache_core/cache/rw
+add wave /testbench_cache_core/cache/lru
 add wave /testbench_cache_core/cache/addr
 add wave /testbench_cache_core/cache/data_in
 add wave /testbench_cache_core/cache/data_out

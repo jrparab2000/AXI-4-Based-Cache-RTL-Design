@@ -17,7 +17,7 @@ module lru_array #(
         lru = 0;
         for(int i =0; i<ASSOC; i++) begin
             if(lrus[index][i] == ({SIZE{1'b1}})) begin
-                lru = lrus[index][i];
+                lru = ASSOC'(i);
             end
         end    
     end

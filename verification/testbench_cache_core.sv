@@ -4,6 +4,7 @@ module testbench_cache_core ();
     localparam DATA_SIZE = 32;
     localparam BLOCK_SIZE = 6;
     localparam INDEX_SIZE = 7; 
+    localparam WR_M_DATA_SIZE = 4; 
     localparam TAG_SIZE = ADDR_SIZE - BLOCK_SIZE - INDEX_SIZE;
     localparam BLOCKS = 2**BLOCK_SIZE;
 
@@ -16,6 +17,7 @@ module testbench_cache_core ();
     logic [ADDR_SIZE-1:0] addr;
     logic [DATA_SIZE-1:0] data_in;
     logic [DATA_SIZE-1:0] data_out;
+    logic cache_ready;
     logic valid_out_c;
     logic hit_miss;
     
@@ -27,11 +29,11 @@ module testbench_cache_core ();
     //Write back interface
     logic ready_wb;
     logic valid_wb;
-    logic [BLOCKS-1:0][DATA_SIZE-1:0] data_out_m;
+    logic [WR_M_DATA_SIZE-1:0][DATA_SIZE-1:0] data_out_m;
 
     //load interface
     logic valid_ld;
-    logic [BLOCKS-1:0][DATA_SIZE-1:0] data_in_m;
+    logic [WR_M_DATA_SIZE-1:0][DATA_SIZE-1:0] data_in_m;
     logic ready_ld;
 
     initial begin
@@ -48,7 +50,15 @@ module testbench_cache_core ();
         end
     end
 
-    cache_top cache (
+    cache_top #(
+        .ASSOC(ASSOC),
+        .ADDR_SIZE(ADDR_SIZE),
+        .DATA_SIZE(DATA_SIZE),
+        .BLOCK_SIZE(BLOCK_SIZE),
+        .INDEX_SIZE(INDEX_SIZE),
+        .WR_M_DATA_SIZE(WR_M_DATA_SIZE),
+        .TAG_SIZE(TAG_SIZE)
+    ) cache (
         .clk(clk),
         .rst_n(rst_n),
         .valid_in_c(valid_in_c),
@@ -56,6 +66,7 @@ module testbench_cache_core ();
         .addr(addr),
         .data_in(data_in),
         .data_out(data_out),
+        .cache_ready(cache_ready),
         .valid_out_c(valid_out_c),
         .hit_miss(hit_miss),
         .addr_valid_out(addr_valid_out),
@@ -73,48 +84,165 @@ module testbench_cache_core ();
         wait(rst_n);
         @(posedge clk)
         @(posedge clk)
-        rw <= 0;
-        valid_in_c <=1;
-        addr <= 32'h00001234;
-        data_in <= 32'h00001234;
-        while (1) begin
-            if(hit_miss)
-                break;
-            if(addr_valid_out) begin
-                if(!rw_out) begin
-                    @(posedge clk)
-                    forever begin
-                        @(posedge clk)
-                        if(ready_ld) begin
-                            break;
-                        end
-                    end
-                    valid_ld <= 1;
-                    data_in_m <= {64{32'h12345678}};
+        wait(cache_ready);
+        @(posedge clk)
 
-                end
-            end
-            @(posedge clk);
-        end
-        @(posedge clk);
-        valid_in_c <=0;
-        @(posedge clk);
-        @(posedge clk);
         rw <= 0;
         valid_in_c <=1;
         addr <= 32'h00001234;
         data_in <= 32'h00001234;
+        ld(32'h1000);
+        
         @(posedge clk);
-        wait(hit_miss);
         valid_in_c <=0;
+
+        wait(cache_ready);
+        @(posedge clk)
+        rw <= 1;
+        valid_in_c <=1;
+        addr <= 32'h10001234;
+        data_in <= 32'h00001234;
+        ld(32'h2000);
+
         @(posedge clk);
+        valid_in_c <=0;
+
+        wait(cache_ready);
+        @(posedge clk)
+        rw <= 0;
+        valid_in_c <=1;
+        addr <= 32'h20001234;
+        data_in <= 32'h00001234;
+        ld(32'h3000);
+
         @(posedge clk);
+        valid_in_c <=0;
+
+        wait(cache_ready);
+        @(posedge clk)
+        rw <= 0;
+        valid_in_c <=1;
+        addr <= 32'h30001234;
+        data_in <= 32'h00001234;
+        ld(32'h4000);
+
+        @(posedge clk);
+        valid_in_c <=0;
+
+        wait(cache_ready);
+        @(posedge clk)
+        rw <= 0;
+        valid_in_c <=1;
+        addr <= 32'h40001234;
+        data_in <= 32'h00001234;
+        ld(32'h5000);
+
+        @(posedge clk);
+        valid_in_c <=0;
+
+        wait(cache_ready);
+        @(posedge clk)
+        rw <= 0;
+        valid_in_c <=1;
+        addr <= 32'h50001234;
+        data_in <= 32'h00001234;
+        ld(32'h6000);
+
+        @(posedge clk);
+        valid_in_c <=0;
+
+        wait(cache_ready);
+        @(posedge clk)
+        rw <= 0;
+        valid_in_c <=1;
+        addr <= 32'h60001234;
+        data_in <= 32'h00001234;
+        ld(32'h7000);
+
+        @(posedge clk);
+        valid_in_c <=0;
+
+        wait(cache_ready);
+        @(posedge clk)
+        rw <= 0;
+        valid_in_c <=1;
+        addr <= 32'h00001234;
+        data_in <= 32'h00001234;
+        ld(32'h8000);
+
+        @(posedge clk);
+        valid_in_c <=0;
+
+        wait(cache_ready);
+        @(posedge clk)
+        rw <= 0;
+        valid_in_c <=1;
+        addr <= 32'h80001234;
+        data_in <= 32'h00001234;
+        ld(32'h9000);
+
+        @(posedge clk);
+        valid_in_c <=0;
+
+        wait(cache_ready);
+        @(posedge clk)
+        rw <= 0;
+        valid_in_c <=1;
+        addr <= 32'h90001234;
+        data_in <= 32'h00001234;
+        ld(32'h1000);
+
+        @(posedge clk);
+        valid_in_c <=0;
+
+        wait(cache_ready);
+        @(posedge clk)
+        rw <= 0;
+        valid_in_c <=1;
+        addr <= 32'h10001234;
+        data_in <= 32'h00001234;
+        ld(32'h2000);
+
+        @(posedge clk);
+        valid_in_c <=0;
+
+        wait(cache_ready);
+        @(posedge clk)
+        rw <= 0;
+        valid_in_c <=1;
+        addr <= 32'h20001234;
+        data_in <= 32'h00001234;
+        ld(32'h3000);
+
+        @(posedge clk);
+        valid_in_c <=0;
+
         $finish();
     end
 
     initial begin
-        #1000
+        #10000
         $display("Test Failed");
         $finish();
     end
+
+    task automatic ld(input [31:0] data);
+        while (1) begin
+            if(hit_miss)
+                break;
+            if(addr_valid_out) begin
+                if(!rw_out&&ready_ld) begin
+                    // int count = 0;
+                    for(int i = 0; i < BLOCKS;i = i + WR_M_DATA_SIZE) begin
+                        @(posedge clk)
+                        valid_ld <= 1;
+                        data_in_m <= {WR_M_DATA_SIZE{i+data}};
+                    end
+                    @(posedge clk);
+                    valid_ld <= 0;
+                end
+            end
+            @(posedge clk);
+        end
+    endtask //automatic
 endmodule

@@ -44,26 +44,25 @@ module tag_array #(
     end
     always_ff @(posedge clk) begin : replacing_logic
         if (replace == 3'b000) begin //reset
-            // foreach(tags[i]) begin
-            //     foreach(tags[i][j]) begin
-            //         tags[i][j] <= 'b0;
-            //         valids[i][j] <= 1'b0;
-            //     end
-            // end
             tags <= tags_next;
             valids <= valids_next;
-            addr <= 0;
+            // addr <= 0;
         end
         else if (replace == 3'b001) begin //miss 
-            addr <= 0;
+            // addr <= 0;
             tags[index][lru] <= tag;
             valids[index][lru] <= 1'b1;
         end
-        else if(replace == 3'b010) begin //miss and write back
-            addr <= {tags[index][lru],index,{BLOCK_SIZE{1'b0}}};
+        
+    end
+
+    always_comb begin
+        addr = {ADDR_SIZE{1'b0}};
+        if(replace == 3'b010) begin //miss and write back
+            addr = {tags[index][lru],index,{BLOCK_SIZE{1'b0}}};
         end
         else if(replace == 3'b011) begin //miss and load back
-            addr <= {tag,index,{BLOCK_SIZE{1'b0}}};
+            addr = {tag,index,{BLOCK_SIZE{1'b0}}};
         end
     end
 

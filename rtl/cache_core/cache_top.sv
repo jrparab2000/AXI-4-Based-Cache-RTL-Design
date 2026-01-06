@@ -10,9 +10,10 @@ module cache_top #(
     parameter ADDR_SIZE = 32,
     parameter DATA_SIZE = 32,
     parameter BLOCK_SIZE = 6,
-    parameter INDEX_SIZE = 7, 
-    parameter TAG_SIZE = ADDR_SIZE - BLOCK_SIZE - INDEX_SIZE,
-    localparam BLOCKS = 1<<BLOCK_SIZE
+    parameter INDEX_SIZE = 7,
+    parameter WR_M_DATA_SIZE = 4, 
+    parameter TAG_SIZE = ADDR_SIZE - BLOCK_SIZE - INDEX_SIZE
+    // localparam BLOCKS = 1<<BLOCK_SIZE
 ) (
     input clk,
     input rst_n,
@@ -23,6 +24,7 @@ module cache_top #(
     input [ADDR_SIZE-1:0] addr,
     input [DATA_SIZE-1:0] data_in,
     output [DATA_SIZE-1:0] data_out,
+    output cache_ready,
     output valid_out_c,
     output hit_miss,
     
@@ -34,11 +36,11 @@ module cache_top #(
     //Write back interface
     input ready_wb,
     output valid_wb,
-    output [BLOCKS-1:0][DATA_SIZE-1:0] data_out_m,
+    output [WR_M_DATA_SIZE-1:0][DATA_SIZE-1:0] data_out_m,
 
     //load interface
     input valid_ld,
-    input [BLOCKS-1:0][DATA_SIZE-1:0] data_in_m,
+    input [WR_M_DATA_SIZE-1:0][DATA_SIZE-1:0] data_in_m,
     output ready_ld
 );
     
@@ -47,7 +49,7 @@ module cache_top #(
     wire match;
     wire valid_tag;
     wire [2:0] tag_replace;
-    wire [2:0] dirty_replace;
+    wire [1:0] dirty_replace;
     wire [2:0] data_replace;
     wire [1:0] lru_replace;
     wire [INDEX_SIZE-1:0] index;
@@ -55,6 +57,7 @@ module cache_top #(
     wire [TAG_SIZE-1:0] tag;
     // wire [ADDR_SIZE-1:0] addr_out;
     wire [BLOCK_SIZE-1:0] block;
+    wire [BLOCK_SIZE-1:0] counter;
 
     lru_array  #(.ASSOC(ASSOC), .INDEX_SIZE(INDEX_SIZE)) lru_mem (
         .clk(clk),
@@ -80,6 +83,7 @@ module cache_top #(
         .index(index),
         .assoc(assoc),
         .block(block),
+        .counter(counter),
         .replace(data_replace),
         .data_in_c(data_in),
         .data_in_m(data_in_m),
@@ -98,6 +102,7 @@ module cache_top #(
         .rst_n(rst_n),
         .rw(rw),
         .valid_in_c(valid_in_c),
+        .cache_ready(cache_ready),
         .hit_miss(hit_miss),
         .out_valid(valid_out_c),
         .dirty(dirty),
@@ -107,6 +112,7 @@ module cache_top #(
         .dirty_replace(dirty_replace),
         .data_replace(data_replace),
         .lru_replace(lru_replace),
+        .count_out(counter),
         .ready_wb(ready_wb),
         .valid_wb(valid_wb),
         .valid_ld(valid_ld),
